@@ -25,7 +25,7 @@ BlockChain.prototype.getLastBlock = function () {
   return this.chain[this.chain.length - 1];
 }
 
-BlockChain.prototype.creatNewTransaction = function (amount, sender, recipient) {
+BlockChain.prototype.createNewTransaction = function (amount, sender, recipient) {
   const newTransaction = {
     amount,
     sender,
@@ -43,7 +43,7 @@ BlockChain.prototype.hashBlock = function (previousBlockHash, currentBlockData, 
 
 BlockChain.prototype.proofOfWork = function (previousBlockHash, currentBlockData) {
   let nonce = 0;
-  let hash = this.hashBlock(previousBlockHash,currentBlockData, nonce);
+  let hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
 
   while(hash.substring(0,4) !== '0000') {
     nonce++;
