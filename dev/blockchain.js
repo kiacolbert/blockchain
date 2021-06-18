@@ -41,7 +41,7 @@ BlockChain.prototype.createNewTransaction = function (amount, sender, recipient)
     recipient,
     transactionId: uuid.v1().split('-').join('')
   }
- return newTransaction;
+  return newTransaction;
 }
 
 BlockChain.prototype.hashBlock = function (previousBlockHash, currentBlockData, nonce) {
@@ -54,11 +54,41 @@ BlockChain.prototype.proofOfWork = function (previousBlockHash, currentBlockData
   let nonce = 0;
   let hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
 
-  while(hash.substring(0,4) !== '0000') {
+  while (hash.substring(0, 4) !== '0000') {
     nonce++;
-    hash = this.hashBlock(previousBlockHash,currentBlockData, nonce);
+    hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
   }
   return nonce;
+}
+
+BlockChain.prototype.chainIsValid = function (blockChain) {
+  let validChain = true;
+  for (let i = 1; i < blockChain.length; i++) {
+    const currentBlock = blockChain[i];
+    const prevBlock = blockChain[i - 1];
+    console.log('previousBlockHash =>', prevBlock.hash);
+    console.log('currentBlockHash =>', currentBlock.hash);
+    if (currentBlock.previousBlockHash !== prevBlock.hash) {
+      validChain = false;
+    }
+    const currentBlockData = { transactions: currentBlock.transactions, index: currentBlock.index };
+    const blockHash = this.hashBlock(prevBlock.hash, currentBlockData, currentBlock.nonce);
+    if (blockHash.substring(0, 4) !== '0000') {
+      validChain = false;
+      console.log('hash', blockHash);
+    }
+
+  }
+  const genesisBlock = blockChain[0];
+  const correctNonce = genesisBlock.nonce === 100;
+  const correctPreviousBlockHash = genesisBlock.previousBlockHash === '0';
+  const correctHash = genesisBlock.hash === '0';
+  const correctTransactions = genesisBlock.transactions.length === 0;
+
+  if (!correctNonce || !correctPreviousBlockHash || !correctHash || !correctTransactions) {
+    validChain = false;
+  }
+  return validChain;
 }
 
 module.exports = BlockChain;
